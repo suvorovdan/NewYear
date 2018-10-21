@@ -1,8 +1,8 @@
 public class Sweet {
-    String name;
-    double weight = 0;
-    double price = 0;
-    String unicMod;
+    private String name;
+    private double weight = 0;
+    private double price = 0;
+    private String unicMod;
 
     Sweet(String name,double cost,String unicMod){
         this.name = name;

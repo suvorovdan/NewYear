@@ -1,13 +1,15 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class Present {
-    double allworth = 0;
-    double allweight = 0;
+    /**Полная стоимость подарка*/
+    private double allworth = 0;
+    /**Вес подарка*/
+    private double allweight = 0;
+    /**Создание списка сладостей содержащихся в подарке с ключём по имени и значением в виде сладости*/
     Map<String, Sweet> Sw = new HashMap<>();
-
+    /**Метод добавления сладости к текущему подарку*/
     public void addSweet(Sweet s){
         Sweet temp = new Sweet();
         temp = Sw.get(s.getName());
@@ -19,15 +21,16 @@ public class Present {
         allweight += s.getWeight();
         allworth += s.getWorth();
     }
+    /**Метод получения информации о содержимом, весе подарка и стоимости подарка*/
     public String info(){
         String str = "";
         for(Sweet s: Sw.values()){
-            str += " " + s.getName() + " " + s.getWeight() + " " + s.getUnicMod() + "\n";
+            str += " " + s.getName() + " " + s.getWeight() + " кг " + s.getUnicMod() + "\n";
         }
-        str += getAllweight() + " - общий вес, " + getAllworth() + " - общая стоимость подарка.";
+        str += String.format("%.3f кг - общий вес, %.2f - общая стоимость подарка.\n", getAllweight(), getAllworth());
         return (str);
     }
-
+    /**Метод удаления из подарка сладости с именем @name вес которой составляет @w */
     public void dellSweet(String name, double w){
         if(Sw.containsKey(name)){
             if(Sw.get(name).getWeight() >= w){
@@ -45,7 +48,7 @@ public class Present {
                 Sw.remove(name);
             }
         }else{
-            System.out.println("не найдена подобная сладость");
+            System.out.println("не найдена данная сладость");
         }
     }
 

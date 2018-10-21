@@ -1,6 +1,6 @@
 public class IkotnieKonfeti extends Sweet {
     public IkotnieKonfeti(double weight){
-        super("Икотные конфеты", 4.6, "заставляют икать");
-        this.weight = weight;
+        super("Икотные конфеты", 2.6, "заставляют икать");
+        setWeight(weight);
     }
 }

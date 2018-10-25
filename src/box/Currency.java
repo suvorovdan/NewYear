@@ -1,7 +1,7 @@
 package box;
 
 public enum Currency {
-    Dollar,
+    PoundSterling,
     Silver,
     Platinum;
 }

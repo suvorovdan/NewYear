@@ -65,11 +65,24 @@ public class Main {
         System.out.println(present.info());
 
 //        Пункт 3
+        /**Перевод общей стоимости из золотых в серебрянные,платиновые и фунты стерлингов*/
         for (Currency currency:Currency.values()){
-            System.out.println(String.format("Стоимость подарка в %s составляет %.2d \n",
-                    currency, present.ExchangeToCurrency(currency)));
+            System.out.println(present.ExchangeToCurrency(currency) + " " + currency + "\n");
         }
+        /**Произвольный перевод валюты с использованием лямбд*/
         System.out.println(present.Ex(gold->gold*1000));
+        System.out.println();
+
+//        Пункт 4
+        /**Вывод всех имён сладостей длина которых не больше 14*/
+        System.out.println(present.namesViaStreamAPI(14));
+        System.out.println();
+        /**Вывод количества порций сладостей(если сладости продаются в упаковках по @portion кг,
+         * то эта функция выведет сколько таких упаковок нам надо будет купить).
+         * Ниже рассмотрена функция для Карамельных бомб, в одной порции(пакете) 3 кг*/
+        System.out.println(present.info());
+        System.out.println(present.portionQuantityOfSweet(karamelnieBombi,3));
+
 
     }
 }

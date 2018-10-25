@@ -2,6 +2,9 @@ package box;
 
 import Sweets.Sweet;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.stream.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,16 +28,16 @@ public class Present {
     /**Вес подарка*/
     private double allweight = 0;
     /**Создание списка сладостей содержащихся в подарке с ключём по имени и значением в виде сладости*/
-    Map<String, Sweet> Sw = new HashMap<>();
+    Map<String, Sweet> presentBox = new HashMap<>();
     /**Метод добавления сладости к текущему подарку*/
     public void addSweet(Sweet s){
         if(notExpensive.test(s)){
             Sweet temp = new Sweet();
-            temp = Sw.get(s.getName());
+            temp = presentBox.get(s.getName());
             if (temp == null) {
-                Sw.put(s.getName(),s);
+                presentBox.put(s.getName(),s);
             }else{
-                Sw.get(s.getName()).setWeight(Sw.get(s.getName()).getWeight() + s.getWeight());
+                presentBox.get(s.getName()).setWeight(presentBox.get(s.getName()).getWeight() + s.getWeight());
             }
             allweight += s.getWeight();
             allworth += s.getWorth();
@@ -46,11 +49,11 @@ public class Present {
     public void addSweetsForFabricWithPolicity(Sweet s){
         if(s != null){
             Sweet temp = new Sweet();
-            temp = Sw.get(s.getName());
+            temp = presentBox.get(s.getName());
             if (temp == null) {
-                Sw.put(s.getName(),s);
+                presentBox.put(s.getName(),s);
             }else{
-                Sw.get(s.getName()).setWeight(Sw.get(s.getName()).getWeight() + s.getWeight());
+                presentBox.get(s.getName()).setWeight(presentBox.get(s.getName()).getWeight() + s.getWeight());
             }
             allweight += s.getWeight();
             allworth += s.getWorth();
@@ -62,7 +65,7 @@ public class Present {
     /**Метод получения информации о содержимом, весе подарка и стоимости подарка*/
     public String info(){
         String str = "";
-        for(Sweet s: Sw.values()){
+        for(Sweet s: presentBox.values()){
             str += String.format("%s %.3f кг %s \n",s.getName(),s.getWeight(),s.getUnicMod());
         }
         str += String.format("%.3f кг - общий вес, %.2f золотых - общая стоимость подарка.\n",
@@ -71,20 +74,20 @@ public class Present {
     }
     /**Метод удаления из подарка сладости с именем @name вес которой составляет @w */
     public void dellSweet(String name, double w){
-        if(Sw.containsKey(name)){
-            if(Sw.get(name).getWeight() >= w){
-                if(Sw.get(name).getWeight() == w){
-                    Sw.remove(name);
+        if(presentBox.containsKey(name)){
+            if(presentBox.get(name).getWeight() >= w){
+                if(presentBox.get(name).getWeight() == w){
+                    presentBox.remove(name);
                 }else{
-                    Sw.get(name).setWeight(Sw.get(name).getWeight() - w);
+                    presentBox.get(name).setWeight(presentBox.get(name).getWeight() - w);
                 }
                 allweight -= w;
-                allworth -= Sw.get(name).getWorth();
+                allworth -= presentBox.get(name).getWorth();
             }else{
                 System.out.println("невозможно удалить больше, поэтому удалиться имеющееся кол-во");
-                allweight -= Sw.get(name).getWeight();
-                allworth -= Sw.get(name).getWorth();
-                Sw.remove(name);
+                allweight -= presentBox.get(name).getWeight();
+                allworth -= presentBox.get(name).getWorth();
+                presentBox.remove(name);
             }
         }else{
             System.out.println("не найдена данная сладость");
@@ -100,32 +103,63 @@ public class Present {
     }
 
     public int getSize(){
-        return Sw.size();
+        return presentBox.size();
     }
-
+    /**Перевод полной стоимости(золото) в другую валюту из списка @Currency*/
     public double ExchangeToCurrency(Currency currency){
         Function<Double,Double> form;
         switch (currency){
             case Silver:
                 form = d -> d * 84.5;
-                return form.apply(allworth);
-            case Dollar:
+                return BigDecimal.valueOf(form.apply(allworth))
+                        .setScale(2, RoundingMode.HALF_EVEN)
+                        .doubleValue();
+            case PoundSterling:
                 form = d -> d * 1260;
-                return form.apply(allworth);
+                return BigDecimal.valueOf(form.apply(allworth))
+                        .setScale(2, RoundingMode.HALF_EVEN)
+                        .doubleValue();
             case Platinum:
                 form = d -> d * 1.53;
-                return form.apply(allworth);
+                return BigDecimal.valueOf(form.apply(allworth))
+                        .setScale(2, RoundingMode.HALF_EVEN)
+                        .doubleValue();
             default:
                 throw new IllegalArgumentException("Неверный тип валюты");
         }
 
     }
-
+    /**Произвольный перевод полной стоимости(золото) в валюту при помоощи лямбд*/
     public double Ex(Function<Double,Double> form){
-        return form.apply(allworth);
+        return BigDecimal.valueOf(form.apply(allworth)).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
-    /*ICostCalculator iCostCalculator = allwo -> {
-        return Math.abs(allwo/100);
-    };*/
+
+    /**Вывод всех сладостей, длина имени которых не превышает @maxLengthOfSweetsName*/
+    public String namesViaStreamAPI(int maxLengthOfSweetsName){
+        String output = "";
+        for(String name:presentBox.keySet()
+                .stream()
+                .filter(str -> str.length()<=maxLengthOfSweetsName)
+                .collect(Collectors.toList())){
+            output += name + " ";
+        }
+        return output;
+    }
+    public int portionQuantityOfSweet(Sweet sweet, double portion){
+        double result = 0;
+        try{
+            result = presentBox.values()
+                    .stream()
+                    .filter(sweet1 -> sweet.getName() == sweet1.getName())
+                    .map(Sweet::getWeight)
+                    .map(w->Math.ceil(w/portion))
+                    .collect(Collectors.toList()).get(0);
+        }catch (ArrayIndexOutOfBoundsException e){
+            System.out.println(e);
+        }
+        return (int)result;
+    }
+
+
 
 }

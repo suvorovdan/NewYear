@@ -1,3 +1,5 @@
+package Sweets;
+
 public class Sweet {
     private String name;
     private double weight = 0;
